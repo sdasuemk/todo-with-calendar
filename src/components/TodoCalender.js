@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import moment from 'moment';
 import CreateButton from './CreateButton'
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import CreateModal from './CreateModal';
 
 const localizer = momentLocalizer(moment);
 
@@ -31,7 +32,23 @@ const TodoCalender = () => {
   const eventsThisWeek = events.filter(event =>
     event.start >= startOfWeek && event.end <= endOfWeek
   );
+
+    // State to handle form visibility and new event data
+    const [isFormVisible, setFormVisible] = useState(false);
+    const [newEvent, setNewEvent] = useState(null);
+
+    console.log('newEvent',newEvent)
   
+    // Click event handler for the date cells in the calendar
+    const handleDateClick = (slotInfo) => {
+      // Show the form and set the date for the new event
+      setFormVisible(true);
+      setNewEvent(slotInfo.start)
+      
+  
+      // Console log the clicked date
+      console.log('Clicked date:', slotInfo.start);
+    };
 
   return (
     <div>
@@ -43,8 +60,10 @@ const TodoCalender = () => {
         style={{ height: 500 }} // Adjust the height as needed
         views={[Views.WEEK]} // Display only the week view
         defaultView={Views.WEEK} // Set the default view to week view
+        selectable // Enable date selection
+        onSelectSlot={handleDateClick} // Handle date click event
       />
-      <CreateButton label = 'Create Todo'/>
+      {isFormVisible && <CreateModal selectedDate={newEvent} isOpen={true}/>}
     </div>
   );
 };
