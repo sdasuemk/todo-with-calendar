@@ -9,6 +9,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import moment from 'moment';
+import {createTodo} from '../api'
 
 const style = {
   position: 'absolute',
@@ -35,15 +36,22 @@ const textFieldStyle = {
   };
 
 export default function CreateModal({selectedDate, isOpen}) {
-  const [open, setOpen] = React.useState(isOpen);
-  const handleClose = () => setOpen(false);
+  const [open, setOpen] = React.useState(true);
+  
+  console.log("isOpen", isOpen);
   const selectedDateOnly = moment(selectedDate, "DD-MM-YY");
   console.log("selectedDate", selectedDateOnly)
   const [formData, setFormData] = React.useState({
     title: '',
+    completed: false,
     startTime: null,
     endTime: null,
   })
+
+  const handleClose = () => {
+    setOpen(false)
+    isOpen(false)
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -68,17 +76,29 @@ export default function CreateModal({selectedDate, isOpen}) {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const formattedData = {
       ...formData,
-      startTime: formData.startTime
-        ? moment(`${selectedDateOnly.format("DD-MM-YY")} ${moment(formData.startTime).format("HH:mm")}`, "DD-MM-YY HH:mm").format("DD-MM-YY HH:mm")
+      start: formData.startTime
+        ? moment(
+            `${selectedDateOnly.format("DD-MM-YY")} ${moment(
+              formData.startTime
+            ).format("HH:mm")}`,
+            "DD-MM-YY HH:mm"
+          ).toDate() 
         : null,
-      endTime: formData.endTime
-        ? moment(`${selectedDateOnly.format("DD-MM-YY")} ${moment(formData.endTime).format("HH:mm")}`, "DD-MM-YY HH:mm").format("DD-MM-YY HH:mm")
+      end: formData.endTime
+        ? moment(
+            `${selectedDateOnly.format("DD-MM-YY")} ${moment(
+              formData.endTime
+            ).format("HH:mm")}`,
+            "DD-MM-YY HH:mm"
+          ).toDate()
         : null,
       };
+
+      await createTodo(formattedData)
     console.log("Submit", formattedData)
 
     handleClose();
