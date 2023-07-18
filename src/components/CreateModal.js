@@ -5,11 +5,11 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import moment from 'moment';
-import {createTodo} from '../api'
+import { createTodo } from '../api';
 
 const style = {
   position: 'absolute',
@@ -24,33 +24,29 @@ const style = {
 };
 
 const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    alignItems: 'center',
-  };
-
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  alignItems: 'center',
+};
 
 const textFieldStyle = {
-    width: '260px', 
-  };
+  width: '260px',
+};
 
-export default function CreateModal({selectedDate, isOpen}) {
+export default function CreateModal({ selectedDate, isOpen, isCreated }) {
   const [open, setOpen] = React.useState(true);
-  
-  console.log("isOpen", isOpen);
-  const selectedDateOnly = moment(selectedDate, "DD-MM-YY");
-  console.log("selectedDate", selectedDateOnly)
+  const selectedDateOnly = moment(selectedDate, 'DD-MM-YY');
   const [formData, setFormData] = React.useState({
     title: '',
     completed: false,
     startTime: null,
     endTime: null,
-  })
+  });
 
   const handleClose = () => {
-    setOpen(false)
-    isOpen(false)
+    setOpen(false);
+    isOpen(false);
   };
 
   const handleChange = (event) => {
@@ -60,8 +56,7 @@ export default function CreateModal({selectedDate, isOpen}) {
       [name]: value,
     }));
   };
- 
-  
+
   const handleStartTimeChange = (time) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -82,31 +77,34 @@ export default function CreateModal({selectedDate, isOpen}) {
       ...formData,
       start: formData.startTime
         ? moment(
-            `${selectedDateOnly.format("DD-MM-YY")} ${moment(
+            `${selectedDateOnly.format('DD-MM-YY')} ${moment(
               formData.startTime
-            ).format("HH:mm")}`,
-            "DD-MM-YY HH:mm"
-          ).toDate() 
+            ).format('HH:mm')}`,
+            'DD-MM-YY HH:mm'
+          ).toDate()
         : null,
       end: formData.endTime
         ? moment(
-            `${selectedDateOnly.format("DD-MM-YY")} ${moment(
+            `${selectedDateOnly.format('DD-MM-YY')} ${moment(
               formData.endTime
-            ).format("HH:mm")}`,
-            "DD-MM-YY HH:mm"
+            ).format('HH:mm')}`,
+            'DD-MM-YY HH:mm'
           ).toDate()
         : null,
-      };
+    };
 
-      await createTodo(formattedData)
-    console.log("Submit", formattedData)
-
-    handleClose();
+    try {
+      await createTodo(formattedData);
+      isCreated('success');
+    } catch (e) {
+      isCreated('error');
+    } finally {
+      handleClose();
+    }
   };
 
   return (
     <div>
-      
       <Modal
         open={open}
         onClose={handleClose}
@@ -114,22 +112,41 @@ export default function CreateModal({selectedDate, isOpen}) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-            <Typography style={formStyle}>Create Todo</Typography>
-         <form style={formStyle} onSubmit={handleSubmit}>
-        
-         <TextField name='title' required id="outlined-basic" label="Title" variant="outlined" style={textFieldStyle} onChange={handleChange}/>
-         <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DemoContainer components={['TimePicker']}>
-                <TimePicker label="Start Time" style={textFieldStyle}  value={formData.startTime || null}  onChange={(time) => handleStartTimeChange(time)}/>
-            </DemoContainer>
-         </LocalizationProvider>
-         <LocalizationProvider dateAdapter={AdapterMoment}>
-            <DemoContainer components={['TimePicker']}>
-                <TimePicker  label="End Time" style={textFieldStyle}  value={formData.endTime || null} onChange={(time) => handleEndTimeChange(time)}/>
-            </DemoContainer>
-         </LocalizationProvider>
-         <Button type='submit'>Submit</Button>
-         </form>
+          <Typography style={formStyle}>
+            Create Todo on {selectedDateOnly.format('DD-MM-YY')}
+          </Typography>
+          <form style={formStyle} onSubmit={handleSubmit}>
+            <TextField
+              name="title"
+              required
+              id="outlined-basic"
+              label="Title"
+              variant="outlined"
+              style={textFieldStyle}
+              onChange={handleChange}
+            />
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DemoContainer components={['TimePicker']}>
+                <TimePicker
+                  label="Start Time"
+                  style={textFieldStyle}
+                  value={formData.startTime || null}
+                  onChange={(time) => handleStartTimeChange(time)}
+                />
+              </DemoContainer>
+            </LocalizationProvider>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <DemoContainer components={['TimePicker']}>
+                <TimePicker
+                  label="End Time"
+                  style={textFieldStyle}
+                  value={formData.endTime || null}
+                  onChange={(time) => handleEndTimeChange(time)}
+                />
+              </DemoContainer>
+            </LocalizationProvider>
+            <Button type="submit">Submit</Button>
+          </form>
         </Box>
       </Modal>
     </div>
