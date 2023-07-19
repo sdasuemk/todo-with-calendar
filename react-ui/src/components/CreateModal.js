@@ -9,6 +9,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import { createTodo } from '../api';
 
 const style = {
@@ -152,3 +153,10 @@ export default function CreateModal({ selectedDate, isOpen, isCreated }) {
     </div>
   );
 }
+
+CreateModal.propTypes = {
+  selectedDate: PropTypes.instanceOf(Date).isRequired,
+  isOpen: PropTypes.func.isRequired,
+  isCreated: PropTypes.func.isRequired,
+};
+
